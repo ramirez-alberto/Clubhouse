@@ -23,6 +23,12 @@ namespace Clubhouse.Data
             }
             context.SaveChanges();
 
+            var posts = new Post[]
+            {
+                new Post{Title="Example Post by user1",Body="Lorem ipsum",UserId = users.Single(u => u.UserName=="pedrasa1").UserId},
+                new Post{Title="Example Post by user2",Body="Lorem ipsum",UserId = users.Single(u => u.UserName=="pedrasa2").UserId},
+                new Post{Title="Another Post by user1",Body="Lorem ipsum",UserId = users.Single(u => u.UserName=="pedrasa1").UserId},
+            };
         }
     }
 }

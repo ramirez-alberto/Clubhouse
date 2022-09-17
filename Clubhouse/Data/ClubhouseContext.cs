@@ -15,5 +15,7 @@ namespace Clubhouse.Data
         }
 
         public DbSet<Clubhouse.Models.User> User { get; set; } = default!;
+
+        public DbSet<Clubhouse.Models.Post> Post { get; set; }
     }
 }
