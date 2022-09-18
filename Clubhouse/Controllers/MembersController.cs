@@ -23,9 +23,16 @@ namespace Clubhouse.Controllers
         }
 
         // GET: Members
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool? myposts)
         {
-            var clubhouseContext = _context.Post.Include(p => p.User);
+            var clubhouseContext = _context.Post.AsNoTracking().Include(p => p.User);
+            if (myposts != null)
+            {
+                clubhouseContext = clubhouseContext
+                    .Where(p => p.User.UserName == User.Identity.Name)
+                    .Include(p => p.User);
+            }
+
             return View(await clubhouseContext.ToListAsync());
         }
 
@@ -62,6 +69,8 @@ namespace Clubhouse.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PostId,Title,Body,RowVersion,UserId")] Post post)
         {
+            var user = await _context.User.AsNoTracking().FirstOrDefaultAsync(p => p.UserName == User.Identity.Name);
+            post.UserId = user.UserId;
             if (ModelState.IsValid)
             {
                 _context.Add(post);
@@ -81,6 +90,7 @@ namespace Clubhouse.Controllers
             }
 
             var post = await _context.Post.FindAsync(id);
+
             if (post == null)
             {
                 return NotFound();
@@ -158,14 +168,14 @@ namespace Clubhouse.Controllers
             {
                 _context.Post.Remove(post);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool PostExists(int id)
         {
-          return _context.Post.Any(e => e.PostId == id);
+            return _context.Post.Any(e => e.PostId == id);
         }
     }
 }
