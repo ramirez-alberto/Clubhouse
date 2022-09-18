@@ -21,9 +21,10 @@ namespace Clubhouse.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var clubhouseContext = _context.Post.Include(p => p.User);
+            return View(await clubhouseContext.ToListAsync());
         }
 
         public IActionResult Privacy()
@@ -44,17 +45,18 @@ namespace Clubhouse.Controllers
         {
             //FindByNameAsync
             var user = await _context.User.FirstOrDefaultAsync(u => u.UserName == username);
-            if (user.UserName == username && user.Password == password)
-            {
-                var claims = new List<Claim>
+            if (user is not null)
+                if (user.UserName == username && user.Password == password)
+                {
+                    var claims = new List<Claim>
                 { new Claim(ClaimTypes.Name, username) };
-                var claimIdentity = new ClaimsIdentity(claims, "Login");
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimIdentity));
-                return Redirect(ReturnUrl == null ? "/Members" : ReturnUrl);
-            }
-            else
-                return View();
+                    var claimIdentity = new ClaimsIdentity(claims, "Login");
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimIdentity));
+                    return Redirect(ReturnUrl == null ? "/Members" : ReturnUrl);
+                }
+            
+            return View();
 
 
         }
