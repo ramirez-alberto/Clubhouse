@@ -8,8 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Clubhouse.Data;
 using Clubhouse.Models;
 
+using Microsoft.AspNetCore.Authorization;
+
 namespace Clubhouse.Controllers
 {
+    [Authorize]
     public class MembersController : Controller
     {
         private readonly ClubhouseContext _context;
