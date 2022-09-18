@@ -4,6 +4,10 @@ namespace Clubhouse.Models
 {
     public class Post
     {
+        public Post()
+        {
+            CreatedDate = DateTime.Now;
+        }
         public int PostId { get; set; }
 
         [Required]
@@ -12,6 +16,8 @@ namespace Clubhouse.Models
 
         [Required]
         public string Body { get; set; }
+
+        public DateTime CreatedDate { get; set; }
 
         [Timestamp]
         public byte[] RowVersion { get; set; }
