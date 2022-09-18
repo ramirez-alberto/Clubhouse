@@ -5,15 +5,20 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
+using Clubhouse.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace Clubhouse.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ClubhouseContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ClubhouseContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
@@ -37,15 +42,16 @@ namespace Clubhouse.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password, string? ReturnUrl)
         {
-
-            if (username == "admin" && password == "admin")
+            //FindByNameAsync
+            var user = await _context.User.FirstOrDefaultAsync(u => u.UserName == username);
+            if (user.UserName == username && user.Password == password)
             {
                 var claims = new List<Claim>
                 { new Claim(ClaimTypes.Name, username) };
                 var claimIdentity = new ClaimsIdentity(claims, "Login");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimIdentity));
-                return Redirect(ReturnUrl == null ? "/Secured" : ReturnUrl);
+                return Redirect(ReturnUrl == null ? "/Members" : ReturnUrl);
             }
             else
                 return View();
